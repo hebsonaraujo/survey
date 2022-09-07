@@ -14,17 +14,18 @@
         <form  ref="surveyForm">
           <div          
             ref="questions"
-            v-for="(k,index) in item.alternatives"                         
+            v-for="(alternative,index) in item.alternatives"                         
             class="card-questions "
-            :class=" k.checked ? 'checked' : 'none'"
+            :class=" alternative.checked ? 'checked' : 'none'"
             v-bind:key="index" >
 
             <label :for="index"> <!--$refs.questions[index].classList.add('checked')-->
-              <!-- @click.self="itemSelected item.type === 'radio'? itemSelected : -->
-              <input  @click.self="initValidation(item.type,$event)" 
+              <input  @click.self="initValidation(item.type, $event)" 
                 :type="item.type" 
-                :id="index" name="vehicle1" value="Bike"  />
-               {{k.text}}
+                :id="index" 
+                name="q"
+                :value="alternative.text" />
+               {{alternative.text}}
             </label>
 
           </div>          
@@ -53,17 +54,23 @@ import myData from '../../../../../data.js'
 export default {  
   data () {  
     return {      
-      items: myData,
-      hasActive: false,
+      items: myData,      
       btnDisabled: true,
       currentActivePosition: 0,
       itemsLength: myData.length,
-      storeAnswers: [],   
-      radioTypeMethods: () => console.log('RADIO')   
+      storeAnswers: [],
+      hasANextQuestion: () => this.currentActivePosition < this.itemsLength,
+      radioTypeMethods: () => console.log('RADIO') ,
+      checked: false  
     }
-  },
-  
+  },  
   methods: {
+    /**
+     * TODO     
+     * 
+     * 3 armazenar os dados corretos referentes a cada questao
+     * 4. enviar informacoes das questoes suas respotas corretas
+     */
     setStatusCard: function(index,status) {      
       Vue.set(
         this.items,
@@ -72,35 +79,50 @@ export default {
       )   
     },
     btnNext: function(ev) {
-      if( this.currentActivePosition < this.itemsLength) { 
+      if( this.hasANextQuestion ) { 
         this.setStatusCard(this.currentActivePosition,false)
         this.setStatusCard(++this.currentActivePosition,true)
         this.btnDisabled = !this.btnDisabled
       }      
     },
-    radioExec: function(la) {
-      this.itemSelected(la)
+    radioExec: function(ev) {
+      this.itemSelected(ev)
     },
-    checkboxExec: function() {
-      alert('lullu')
-
+    checkboxExec: function(ev) {
+      this.checkSelected(ev)
     },
-    initValidation: function(ev,la) {
-      this[`${ev}Exec`](la);     
+    checkSelected: function({ target: { id } }) {
+      const { alternatives } = this.items[this.currentActivePosition];      
+      if( alternatives[id].checked ) {
+        alternatives[id].checked  = false;        
+      } else {        
+        this.btnDisabled = false
+        Vue.set(
+          alternatives,
+          id,
+          { ...this.items[this.currentActivePosition].alternatives[id],'checked': true}
+        )
+      }
+      this.btnDisabled = !alternatives.some(el => el.checked);
+    },
+    initValidation: function(inputType,ev) {
+      this[`${inputType}Exec`](ev);
     },
     itemSelected: function({ target: { id } }) {      
       this.btnDisabled = false;
-      const { alternatives } = this.items[0];
+      const { alternatives } = this.items[this.currentActivePosition];
       alternatives.forEach( el => {
         if(el.checked) {
           el.checked = false
-        }        
-      })     
+        }
+        console.log('#######',el)
+      }) 
+      
       
       Vue.set(
-        this.items[0].alternatives,
+        alternatives,
         id,
-        { text:this.items[0].alternatives[id].text,'checked': true}
+        { ...this.items[this.currentActivePosition].alternatives[id],'checked': true}
       )
       
       // this.$forceUpdate();
@@ -113,8 +135,6 @@ export default {
   },
   mounted: function () {
     this.setStatusCard(0,true)
-    
-    console.log('innn',this.radioTypeMethods(),myData,this.itemsLength)  
   }
 }
 </script>
