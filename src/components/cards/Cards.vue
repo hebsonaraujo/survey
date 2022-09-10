@@ -3,13 +3,11 @@
     <div v-for="(item,index) in items" v-if="item.active">
       <!-- do not use v-if with v-for https://v2.vuejs.org/v2/style-guide/#Avoid-v-if-with-v-for-essential -->
 
-      <header>
-        <span id="progress">{{ index + 1 }} / {{items.length}}</span>  
-        <img src="http://www.panificadorakennedy.com.br/pesquisa/assets/imgs/logo.png">
-      </header>
-
+      <CardHeader></CardHeader>
+      <CardCounter :items="items" :index="index"></CardCounter>
       <section class="card-wrapper" >
-        <h2 id="pergunta"> {{item.question}} </h2>
+        
+        <Title :item="item"></Title>
 
         <form  ref="surveyForm">
           <div          
@@ -35,101 +33,83 @@
 
     </div>    
     
-    <button 
-      @click = "btnNext"
-      v-bind:disabled="btnDisabled"
-      id="btn-pass" 
-      type="button" 
-      class="btn btn-primary" 
-      >
-        Próximo
-    </button>
+    <Button @click.native="btnNext" :btnDisabled="btnDisabled"></Button>
   </section>
 </template>
 
 <script>
 import Vue from 'vue';
-import myData from '../../../../../data.js'
+import CardHeader from '../card-header/CardHeader.vue';
+import myData from '../../../../../data.js';
+import CardCounter from '../card-counter/cardCounter.vue';
+import Button from '../button/Button.vue';
+import Title from '../title/Title.vue';
 
-export default {  
-  data () {  
-    return {      
-      items: myData,      
-      btnDisabled: true,
-      currentActivePosition: 0,
-      itemsLength: myData.length,
-      storeAnswers: [],
-      hasANextQuestion: () => this.currentActivePosition < this.itemsLength,      
-      checked: false  
-    }
-  },  
-  methods: {
-    /**
-     * TODO     
-     * 
-     * 3 armazenar os dados corretos referentes a cada questao
-     * 4. enviar informacoes das questoes suas respotas corretas
-     */
-    setStatusCard: function(index,status) {      
-      Vue.set(
-        this.items,
-        index,
-        { ...this.items[index],'active': status}
-      )   
+export default {
+    components: { CardHeader, CardCounter, Button, Title },
+    data() {
+        return {
+            items: myData,
+            btnDisabled: true,
+            currentActivePosition: 0,
+            itemsLength: myData.length,
+            storeAnswers: [],
+            hasANextQuestion: () => this.currentActivePosition < this.itemsLength,
+            checked: false
+        };
     },
-    btnNext: function(ev) {
-      if( this.hasANextQuestion ) { 
-        this.setStatusCard(this.currentActivePosition,false)
-        this.setStatusCard(++this.currentActivePosition,true)
-        this.btnDisabled = !this.btnDisabled
-      }      
-    },
-    radioExec: function(ev) {
-      this.itemSelected(ev)
-    },
-    checkboxExec: function(ev) {
-      this.checkSelected(ev)
-    },
-    checkSelected: function({ target: { id } }) {
-      const { alternatives } = this.items[this.currentActivePosition];      
-      if( alternatives[id].checked ) {
-        alternatives[id].checked  = false;        
-      } else {        
-        this.btnDisabled = false
-        Vue.set(
-          alternatives,
-          id,
-          { ...this.items[this.currentActivePosition].alternatives[id],'checked': true}
-        )
-      }
-      this.btnDisabled = !alternatives.some(el => el.checked);
-    },
-    initValidation: function(inputType,ev) {
-      this[`${inputType}Exec`](ev);
-    },
-    itemSelected: function({ target: { id } }) {      
-      this.btnDisabled = false;
-      const { alternatives } = this.items[this.currentActivePosition];
-      alternatives.forEach( el => {
-        if(el.checked) {
-          el.checked = false
+    methods: {
+        /**
+         * TODO
+         *
+         * 3 armazenar os dados corretos referentes a cada questao
+         * 4. enviar informacoes das questoes suas respotas corretas
+         */
+        setStatusCard: function (index, status) {
+            Vue.set(this.items, index, { ...this.items[index], "active": status });
+        },
+        btnNext: function (ev) {
+            console.log('============')
+            if (this.hasANextQuestion) {
+                this.setStatusCard(this.currentActivePosition, false);
+                this.setStatusCard(++this.currentActivePosition, true);
+                this.btnDisabled = !this.btnDisabled;
+            }
+        },
+        radioExec: function (ev) {
+            this.itemSelected(ev);
+        },
+        checkboxExec: function (ev) {
+            this.checkSelected(ev);
+        },
+        checkSelected: function ({ target: { id } }) {
+            const { alternatives } = this.items[this.currentActivePosition];
+            if (alternatives[id].checked) {
+                alternatives[id].checked = false;
+            }
+            else {
+                this.btnDisabled = false;
+                Vue.set(alternatives, id, { ...this.items[this.currentActivePosition].alternatives[id], "checked": true });
+            }
+            this.btnDisabled = !alternatives.some(el => el.checked);
+        },
+        initValidation: function (inputType, ev) {
+            this[`${inputType}Exec`](ev);
+        },
+        itemSelected: function ({ target: { id } }) {
+            this.btnDisabled = false;
+            const { alternatives } = this.items[this.currentActivePosition];
+            alternatives.forEach(el => {
+                if (el.checked) {
+                    el.checked = false;
+                }
+            });
+            Vue.set(alternatives, id, { ...this.items[this.currentActivePosition].alternatives[id], "checked": true });
         }
-      }) 
-      
-      
-      Vue.set(
-        alternatives,
-        id,
-        { ...this.items[this.currentActivePosition].alternatives[id],'checked': true}
-      )
-      
-    }
-
-
-  },
-  mounted: function () {
-    this.setStatusCard(0,true)
-  }
+    },
+    mounted: function () {
+        this.setStatusCard(0, true);
+    }    
 }
 </script>
 
@@ -161,22 +141,8 @@ export default {
   border-radius: 10px;
   cursor: pointer;
 }
-.cards span {
-  font-weight: bold;
-  font-size: 21px;
-  display: inline-block;
-  background: orange;
-  border-radius: 100%;  
-  height: 50px;
-  width: 50px;
-  padding: 10px 5px 10px;
-  box-sizing: border-box;
-}
-.cards h2 {
-  font-weight: bold;
-  text-align: center;
-  margin: 15px 0;
-}
+
+
 
 .cards ul {
   list-style: none;
