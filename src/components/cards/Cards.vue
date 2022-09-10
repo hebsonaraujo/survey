@@ -19,11 +19,11 @@
             :class=" alternative.checked ? 'checked' : 'none'"
             v-bind:key="index" >
 
-            <label :for="index"> <!--$refs.questions[index].classList.add('checked')-->
+            <label :for="index">
               <input  @click.self="initValidation(item.type, $event)" 
                 :type="item.type" 
                 :id="index" 
-                name="q"
+                name="questions"
                 :value="alternative.text" />
                {{alternative.text}}
             </label>
@@ -59,8 +59,7 @@ export default {
       currentActivePosition: 0,
       itemsLength: myData.length,
       storeAnswers: [],
-      hasANextQuestion: () => this.currentActivePosition < this.itemsLength,
-      radioTypeMethods: () => console.log('RADIO') ,
+      hasANextQuestion: () => this.currentActivePosition < this.itemsLength,      
       checked: false  
     }
   },  
@@ -115,7 +114,6 @@ export default {
         if(el.checked) {
           el.checked = false
         }
-        console.log('#######',el)
       }) 
       
       
@@ -125,10 +123,6 @@ export default {
         { ...this.items[this.currentActivePosition].alternatives[id],'checked': true}
       )
       
-      // this.$forceUpdate();
-      // this.$refs.questions[id].classList.add('checked');
-      // console.log('@@@@',this.lala(),id,this.items)//id,this.$refs,ev.target.id)
-      // console.log('---',ev,ev.target.parentElement.parentElement.classList.add('checked')) //this,this.$refs,this.$refs.surveyForm[0], v-on:click.capture="addCheck"
     }
 
 
