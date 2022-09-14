@@ -1,39 +1,17 @@
 <template>
-  <section class="cards" >
+  <section class="cards">
     <div v-for="(item,index) in items" v-if="item.active">
       <!-- do not use v-if with v-for https://v2.vuejs.org/v2/style-guide/#Avoid-v-if-with-v-for-essential -->
 
       <CardHeader></CardHeader>
       <CardCounter :items="items" :index="index"></CardCounter>
-      <section class="card-wrapper" >
-        
+      <section class="card-wrapper">        
         <Title :item="item"></Title>
-
-        <form  ref="surveyForm">
-          <div          
-            ref="questions"
-            v-for="(alternative,index) in item.alternatives"                         
-            class="card-questions "
-            :class=" alternative.checked ? 'checked' : 'none'"
-            v-bind:key="index" >
-
-            <label :for="index">
-              <input  @click.self="initValidation(item.type, $event)" 
-                :type="item.type" 
-                :id="index" 
-                name="questions"
-                :value="alternative.text" />
-               {{alternative.text}}
-            </label>
-
-          </div>          
-        </form>
-
+        <Form @custom="updateBtn" :item="item" :currentActivePosition="currentActivePosition"></Form>
       </section>
-
-    </div>    
+    </div>
     
-    <Button @click.native="btnNext" :btnDisabled="btnDisabled"></Button>
+    <Button @click.native="btnNext" :btnDisabled="btnDisabled" ></Button>
   </section>
 </template>
 
@@ -44,9 +22,10 @@ import myData from '../../../../../data.js';
 import CardCounter from '../card-counter/cardCounter.vue';
 import Button from '../button/Button.vue';
 import Title from '../title/Title.vue';
+import Form from '../form/Form.vue';
 
 export default {
-    components: { CardHeader, CardCounter, Button, Title },
+    components: { CardHeader, CardCounter, Button, Title, Form },
     data() {
         return {
             items: myData,
@@ -68,44 +47,20 @@ export default {
         setStatusCard: function (index, status) {
             Vue.set(this.items, index, { ...this.items[index], "active": status });
         },
-        btnNext: function (ev) {
-            console.log('============')
+        btnNext: function () {
             if (this.hasANextQuestion) {
                 this.setStatusCard(this.currentActivePosition, false);
                 this.setStatusCard(++this.currentActivePosition, true);
                 this.btnDisabled = !this.btnDisabled;
             }
         },
-        radioExec: function (ev) {
-            this.itemSelected(ev);
-        },
-        checkboxExec: function (ev) {
-            this.checkSelected(ev);
-        },
-        checkSelected: function ({ target: { id } }) {
-            const { alternatives } = this.items[this.currentActivePosition];
-            if (alternatives[id].checked) {
-                alternatives[id].checked = false;
-            }
-            else {
-                this.btnDisabled = false;
-                Vue.set(alternatives, id, { ...this.items[this.currentActivePosition].alternatives[id], "checked": true });
-            }
-            this.btnDisabled = !alternatives.some(el => el.checked);
-        },
-        initValidation: function (inputType, ev) {
-            this[`${inputType}Exec`](ev);
-        },
-        itemSelected: function ({ target: { id } }) {
-            this.btnDisabled = false;
-            const { alternatives } = this.items[this.currentActivePosition];
-            alternatives.forEach(el => {
-                if (el.checked) {
-                    el.checked = false;
-                }
-            });
-            Vue.set(alternatives, id, { ...this.items[this.currentActivePosition].alternatives[id], "checked": true });
+        updateBtn: function(btnStatus){
+          this.btnDisabled = btnStatus;
+          console.log('FFF',btnStatus)        
         }
+
+        
+        
     },
     mounted: function () {
         this.setStatusCard(0, true);
@@ -122,72 +77,4 @@ export default {
     margin-top: 30px;
     width: 600px;
 }
-.cards li {
-  font-size: 18px;
-  padding: 10px;
-}
-.cards ul li:before {  
-    border: 2px solid white;
-    content: '';
-    width: 13px;
-    height: 13px;
-    margin: 0 15px;
-    border-radius: 100%;
-    display: inline-block;
-}
-.cards ul li:hover {
-  color: black;
-  background-color:rgba(256, 256, 256, 0.6);
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-
-
-.cards ul {
-  list-style: none;
-}
-.card-wrapper {
-
-}
-.card-questions label {
-  padding: 20px 48px 20px 90px;
-  display: block;
-    position: relative;
-    padding: 10px 10% 10px calc(10% + 35px);
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-.card-questions:hover {
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-.card-questions.checked {
-  background-color: #7d461a;
-}
-#btn-pass[disabled] {
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #666;
-    cursor: not-allowed;
-}
-
-#btn-pass {
-  display: block;
-    background-color: #7d461a;
-    height: 48px;
-    padding: 0px 30px;
-    color: #fff;
-    font-family: "Gilroy";
-    font-weight: 800;
-    font-size: 1.4em;
-    border: 0;
-    border-radius: 24px;
-    cursor: pointer;
-    margin: 0 10%;
-}
-    
-
 </style>
