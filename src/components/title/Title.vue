@@ -4,12 +4,7 @@
 
 <script>
   export default {
-    props: ['item'],
-    data: function () {
-      return {
-        
-      }
-    }   
+    props: ['item']    
   }
 
 </script>

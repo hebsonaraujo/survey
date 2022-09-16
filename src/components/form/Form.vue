@@ -71,12 +71,12 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}
-.card-questions:hover {
-  background-color: rgba(255, 255, 255, 0.4);
-}
-.card-questions.checked {
-  background-color: #7d461a;
-}
+  }
+  .card-questions:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+  .card-questions.checked {
+    background-color: #7d461a;
+  }
   
 </style>

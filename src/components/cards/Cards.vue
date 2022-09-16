@@ -32,7 +32,6 @@ export default {
             btnDisabled: true,
             currentActivePosition: 0,
             itemsLength: myData.length,
-            storeAnswers: [],
             hasANextQuestion: () => this.currentActivePosition < this.itemsLength,
             checked: false
         };
@@ -42,7 +41,8 @@ export default {
          * TODO
          *
          * 3 armazenar os dados corretos referentes a cada questao
-         * 4. enviar informacoes das questoes suas respotas corretas
+         * 4. checar se eh ultimo card e mostrar status de 'form concluido'
+         * 5. enviar informacoes das questoes suas respotas corretas
          */
         setStatusCard: function (index, status) {
             Vue.set(this.items, index, { ...this.items[index], "active": status });
@@ -54,13 +54,9 @@ export default {
                 this.btnDisabled = !this.btnDisabled;
             }
         },
-        updateBtn: function(btnStatus){
+        updateBtn: function(btnStatus) {
           this.btnDisabled = btnStatus;
-          console.log('FFF',btnStatus)        
         }
-
-        
-        
     },
     mounted: function () {
         this.setStatusCard(0, true);

@@ -9,11 +9,6 @@ import Cards from '../cards/Cards.vue'
 export default {  
   components: {    
     'card-survey': Cards
-  },
-  data () {
-    return {
-      msg: ''
-    }
   }
 }
 </script>
@@ -26,8 +21,5 @@ export default {
     display: grid;
     align-items: center;
     justify-items: center;
-
 }
-    
-
 </style>
